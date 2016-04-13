@@ -11,28 +11,39 @@ import Foundation
 class InstagramAPI {
     /* Connects with the Instagram API and pulls resources from the server. */
     func loadPhotos(completion: (([Photo]) -> Void)!) {
-        /* 
-         * 1. Get the endpoint URL to the popular photos 
+        /*
+         * 1. Get the endpoint URL to the popular photos
          *    HINT: Look in Utils
          * 2. Create a Session
          * 3. Create a Data Task with a URL and completionHandler
          *    If no error:
-         *       a. Get NSDictionary from the JSON object, from key the "photos"
+         *       a. Get NSDictionary from the JSON object, from key the "data"
          *       b. Create Array of NSDictionaries (one NSDictionary for each photo)
          *       c. For each NSDictionary, create a Photo object, and add to Photos array
          *       d. Wait for completion of Photos array
          */
         // FILL ME IN
         var url: NSURL
-
-        let task = NSURLSession.sharedSession().dataTaskWithURL(url) {
+        url = Utils.getPopularURL()
+        let task = NSURLSession.sharedSession().dataTaskWithURL(url, completionHandler: {
             (data: NSData?, response: NSURLResponse?, error: NSError?) -> Void in
             if error == nil {
                 //FIX ME
-                var photos: [Photo]!
+                var photos: [Photo]! = []
                 do {
-                    let feedDictionary = try NSJSONSerialization.JSONObjectWithData(data!, options: NSJSONReadingOptions.MutableContainers) as! NSDictionary
+                    let jsonResult = try NSJSONSerialization.JSONObjectWithData(data!, options: NSJSONReadingOptions.MutableContainers) as! NSDictionary
                     // FILL ME IN, REMEMBER TO USE FORCED DOWNCASTING
+                    
+                    
+                    
+                    let dataArray = jsonResult["data"] as! NSArray
+                    
+                    for photoDictionary in dataArray {
+                        let photo = Photo(data: photoDictionary as! NSDictionary)
+                        photos.append(photo)
+                        
+                    }
+                    
                     
                     
                     // DO NOT CHANGE BELOW
@@ -46,7 +57,7 @@ class InstagramAPI {
                     print("ERROR: \(error.localizedDescription)")
                 }
             }
-        }
+        })
         task.resume()
     }
 }
