@@ -10,7 +10,7 @@ import UIKit
 
 class PhotosCollectionViewController: UICollectionViewController {
     var photos: [Photo]!
-    //var selPhoto: UIImage!
+    var image: UIImage!
     
     
     override func viewDidLoad() {
@@ -71,7 +71,9 @@ class PhotosCollectionViewController: UICollectionViewController {
     }
     
     override func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
+        print("item Selected: \(indexPath.row)")
         self.performSegueWithIdentifier("showImage", sender: self)
+        
     }
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
@@ -83,9 +85,23 @@ class PhotosCollectionViewController: UICollectionViewController {
             let indexPath = indexPaths[0] as NSIndexPath
             
             let vc = segue.destinationViewController as! NewViewController
+            var selectedPhoto = photos[indexPath.row]
             
-            //vc.image =
-            //vc.title =
+            let url = NSURL(string: selectedPhoto.url)
+            let session = NSURLSession.sharedSession()
+            let task = session.dataTaskWithURL(url!, completionHandler: {
+                (data, response, error) -> Void in
+                if error == nil {
+                    let img = UIImage(data: data!)
+                    vc.image = img!
+                    
+                }
+            })
+            task.resume()
+            vc.username = selectedPhoto.username!
+            vc.date = selectedPhoto.date!
+            vc.likes = selectedPhoto.likes!
+            
         }
     }
     
